@@ -1,6 +1,6 @@
 # StevieDex
 
-StevieDex is a python project I made for my university class at Monctlair university. 
+StevieDex is a python project I made for my python class at Monctlair university. 
 
 ## Dependencies
 
