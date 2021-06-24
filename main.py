@@ -3,10 +3,12 @@ import pokemon as pk
 from pokemon_types import AllPokemonTypes
 from graphs import GetGraphDataForPokemon, DrawPlotFromData
 from PIL import Image
-commands = ["pokemon"]
+commands = ["pokemon", "type", "pictures"]
 def PrintMenuOptions():
     print("Please select from the following options: ")
     print("[0] Pokemon")
+    print("[1] Pokemon Types")
+    print("[2] Pokemon Pictures")
 
 if __name__ == "__main__":
     # Initialize the pokemon data
@@ -75,9 +77,20 @@ if __name__ == "__main__":
             # Uses native image program with operating system, such as the Photos application from windows. (Will take a few seconds to load)
             pokemonImage = Image.open(data["Picture"])
             pokemonImage.show()
-        #elif userInput == 1:                
-        #else:
-   
+            
+        elif userInput == 1:  
+            # Print out all Pokemon Types (File Paths)
+            for thisType in AllPokemonTypes.filePaths:
+                print("{name:<15}: {path:-<38}".format(name=thisType, path=AllPokemonTypes.filePaths[thisType] ))
+                print("{:-<50}".format(""))              
+        else:
+            # Print out all Pokemon Pictures (File Paths)
+            # Very slow, mostly juse useful for proof of concept, being able to pull pictures by the name of a pokemon
+            for pokemon in PokemonData:
+                picture = PokemonData[pokemon].GetPicture()
+                if PokemonData[pokemon].name is not None and picture is not None:
+                    print("{name:<15}: {path:-<38}".format(name=PokemonData[pokemon].name, path=picture ))
+                    print("{:-<50}".format(""))
 
 
 
