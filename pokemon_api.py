@@ -1,14 +1,10 @@
-
 import csv
 import os
-import re 
-from pokemon import Pokemon
+import re
+import pokemon as pk
 
-# initialze static path vari 
 Root = os.getcwd()
 PokemonDataset = os.path.join(Root, "datasets\\pokemon_stats\\pokemon.csv")
-
-# initialze bounds data to get an accurate idea of where pkm stat are relative
 LowerBounds = {
     "hp": 1,
     "attack": 5,
@@ -25,11 +21,13 @@ UpperBounds = {
     "sp_defense": 230,
     "speed": 180,
 }
-
-# I got this from stacks overflow to convert rgb to hex because matplotlib uses hex values
+# I got this from stack overflow to convert rgb to hex because matplotlib uses hex values
 def rgb_to_hex(rgb_color):
+    #0 rgb(1, 1, 1)
+    #1 "(1, 1, 1)"
+    #2 "1,1,1"
     rgb_color = re.search('\(.*\)', rgb_color).group(0).replace(' ', '').lstrip('(').rstrip(')')
-    [r, g, b] = [int(x) for x in rgb_color.split(',')]
+    [r, g, b] = [int(x) for x in rgb_color.split(',')] # [1, 1, 1]
     # check if in range 0~255
     assert 0 <= r <= 255
     assert 0 <= g <= 255
@@ -46,14 +44,12 @@ def rgb_to_hex(rgb_color):
     hex_color = '#' + r + g + b
     return hex_color
 
-
 def FindPokemonByName(name, data = None):
     if data is None:
         data = ImportAndConstructPokemon()
-    name = name.capitalize()
+    name = name.lower()
     return data[name] if name in data else None
 
-#delete later
 def FindAllPokemonByType(types, data = None):
     if data is None:
         data = ImportAndConstructPokemon()
@@ -74,14 +70,13 @@ def ImportAndConstructPokemon():
         Pokemen = {}
         try:
             for row in CsvReader:
-                ThisPokemon = Pokemon(row)
+                ThisPokemon = pk.Pokemon(row)
                 if not ThisPokemon.name in Pokemen:
                     Pokemen[ThisPokemon.name] = ThisPokemon
         except csv.Error as e:
             print(e)
 
         return Pokemen
-#initalize static pkm data for future use
 pokemonData = ImportAndConstructPokemon()
 def GetStatWeight(statType, amount):
     if statType in UpperBounds:
@@ -99,7 +94,7 @@ def GetColorOfStatWeight(statType, amount, hex = False):
 
 def GetPictureForPokemon(pokemon):
     files = [f for f in os.listdir("datasets\\pokemon_photos") if os.path.isfile(os.path.join("datasets\\pokemon_photos", f))]
-    if isinstance(pokemon, Pokemon):
+    if isinstance(pokemon, pk.Pokemon):
         for thisFile in files:
             if pokemon.name.lower() in thisFile:
                 return os.path.join(os.getcwd(), "datasets\\pokemon_photos", thisFile)
@@ -109,3 +104,6 @@ def GetPictureForType(pokemonType):
     for thisFile in files:
         if pokemonType.lower() in thisFile:
             return os.path.join(os.getcwd(), "datasets\\pokemon_types", thisFile)
+
+testPokemon = FindPokemonByName("Charizard")
+# print(GetColorOfStatWeight("hp", 50, hex = True))

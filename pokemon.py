@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-#created a class to store the static data of the pkm (i found this data in spreadsheet)
+import pokemon_api as pokeapi
+
 class Pokemon:
     def __init__(self, payload):
         self.abilities = payload[0]
@@ -33,7 +33,7 @@ class Pokemon:
         self.experience_growth = float(payload[26])
         self.height_m = float(payload[27])
         self.hp = float(payload[28])
-        self.name = payload[29]
+        self.name = payload[29].lower()
         self.percentage_male = float(payload[30])
         self.pokedex_number = float(payload[31])
         self.sp_attack = float(payload[32])
@@ -44,34 +44,11 @@ class Pokemon:
         self.weight_kg = float(payload[37])
         self.generation = payload[38]
         self.is_legendary = payload[39]
-
-
-    #I created methods to determin if one pokemon is stronger then other 
-    def IsStrongAgainst(self, pokemon_type):
-        # print("Strong: ", pokemon_type, self.against_coefficients[pokemon_type] if pokemon_type in self.against_coefficients else False)
-        #Found the coefficent of fighting based on pkm type and ensure that type is a number. Guardclause added since some data was emplty strings
-        if not pokemon_type in self.against_coefficients or isinstance(self.against_coefficients[pokemon_type], str):
-            return False
-        #if the coefficent is >1 then we are stronger then type check, this is true for the other type checkers
-        return self.against_coefficients[pokemon_type] > 1 or False
-    #abstracted version where you can use pkm class instead of type (using this one since I needed an avg)
-    def IsStrongerThan(self, pokemon):
-        Stronger = 0
-        AttributeCount = 0
-        if pokemon.type1 is not None and pokemon.type1 in self.against_coefficients:
-            AttributeCount += 1
-            Stronger += self.against_coefficients[pokemon.type1]
-        if pokemon.type2 is not None and pokemon.type2 in self.against_coefficients:
-            AttributeCount += 1
-            Stronger += self.against_coefficients[pokemon.type2]
-        return Stronger / AttributeCount > 1
-    #similar to stronger methods 
     def IsWeakAgainst(self, pokemon_type):
         # print("Weak: ", pokemon_type, self.against_coefficients[pokemon_type] if pokemon_type in self.against_coefficients else False)
         if not pokemon_type in self.against_coefficients or isinstance(self.against_coefficients[pokemon_type], str):
             return False
-        return self.against_coefficients[pokemon_type] < 1 or False
-    
+        return self.against_coefficients[pokemon_type] > 1 or False
     def IsWeakerThan(self, pokemon):
         Weaker = 0
         AttributeCount = 0
@@ -81,9 +58,26 @@ class Pokemon:
         if pokemon.type2 is not None and pokemon.type2 in self.against_coefficients:
             AttributeCount += 1
             Weaker += self.against_coefficients[pokemon.type2]
-        return Weaker / AttributeCount < 1
+        return Weaker / AttributeCount > 1
 
-    #similar to stronger methods
+    def IsStrongAgainst(self, pokemon_type):
+        # print("Strong: ", pokemon_type, self.against_coefficients[pokemon_type] if pokemon_type in self.against_coefficients else False)
+        if not pokemon_type in self.against_coefficients or isinstance(self.against_coefficients[pokemon_type], str):
+            return False
+        return self.against_coefficients[pokemon_type] < 1 or False
+    
+    def IsStrongerThan(self, pokemon):
+        Stronger = 0
+        AttributeCount = 0
+        if pokemon.type1 is not None and pokemon.type1 in self.against_coefficients:
+            AttributeCount += 1
+            Stronger += self.against_coefficients[pokemon.type1]
+        if pokemon.type2 is not None and pokemon.type2 in self.against_coefficients:
+            AttributeCount += 1
+            Stronger += self.against_coefficients[pokemon.type2]
+        return Stronger / AttributeCount < 1
+
+
     def IsNeutralAgainst(self, pokemon_type):
         # print("Neutral: ", pokemon_type, self.against_coefficients[pokemon_type] if pokemon_type in self.against_coefficients else False)
         if not pokemon_type in self.against_coefficients or isinstance(self.against_coefficients[pokemon_type], str):
@@ -101,9 +95,16 @@ class Pokemon:
             Neutral += self.against_coefficients[pokemon.type2]
         return Neutral / AttributeCount == 1
 
-    #returns all pkm types where this pkm is favored (used list comph for performance)
-    def StrongToTypes(self):
-        return [x for x in self.against_coefficients if self.against_coefficients[x] > 1]
-    
     def WeakerToTypes(self):
+        return [x for x in self.against_coefficients if self.against_coefficients[x] > 1]
+
+    def StrongToTypes(self):
         return [x for x in self.against_coefficients if self.against_coefficients[x] < 1]
+
+    def GetPicture(self):
+        self.picture = pokeapi.GetPictureForPokemon(self)
+        return self.picture
+
+
+
+
